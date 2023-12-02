@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 TextField(
                   maxLines: 1,
                   decoration: InputDecoration(
-                    labelText: "Description",
+                    labelText: "Title",
                     labelStyle: TextStyle(
                         color: ColorConstants.primaryColor,
                         fontSize: 20,
@@ -78,21 +78,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 20,
                 ),
-                TextField(
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    labelText: "Title",
-                    labelStyle: TextStyle(
-                        color: ColorConstants.primaryColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(
+                SizedBox(
+                  height: 150,
+                  child: TextField(
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    textAlign: TextAlign.start,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      hintText: "Description",
+
+                      labelStyle: TextStyle(
                           color: ColorConstants.primaryColor,
-                        )),
-                    isDense: false, // Added this
-                    contentPadding: EdgeInsets.all(20),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(
+                            color: ColorConstants.primaryColor,
+                          )),
+                      isDense: false, // Added this
+                      contentPadding: EdgeInsets.all(20),
+                    ),
                   ),
                 ),
                 SizedBox(

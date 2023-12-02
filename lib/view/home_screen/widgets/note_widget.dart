@@ -86,17 +86,17 @@ class NoteWidgets extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "category",
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            Text(
                               "Date",
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(color: Colors.white),
-                            )
+                            ),
+                            IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Icons.share,
+                                  color: Colors.white,
+                                ))
                           ],
                         )
                       ],
