@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_project_1/utils/color_constants.dart';
-
+import '../../controller/home_screen_controller.dart';
+import '../../model/category_model.dart';
 import 'widgets/note_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,6 +13,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  var box = Hive.box('noteBox');
+  TextEditingController categoryController = TextEditingController();
+  CategoryController obj = CategoryController();
+  List<Category> categories = [];
+
+  @override
+  void initState() {
+    obj.initializeApp();
+    categories = obj.getAllCategories();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,26 +135,46 @@ class _HomeScreenState extends State<HomeScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: List.generate(
-                        4,
-                        (index) => Padding(
-                              padding: const EdgeInsets.only(right: 15),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 15,
-                                  vertical: 10,
+                        categories.length + 1,
+                        (index) => index == categories.length
+                            ? InkWell(
+                                onTap: () => AddCategory(context),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 15,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Text(
+                                    " + Add Category",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white),
+                                  ),
                                 ),
-                                decoration: BoxDecoration(
-                                    color: ColorConstants.secondaryColor3,
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Text(
-                                  "Category",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.only(right: 15),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 15,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: ColorConstants.secondaryColor3,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Text(
+                                    categories[index].name,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white),
+                                  ),
                                 ),
-                              ),
-                            )),
+                              )),
                   ),
                 ),
                 SizedBox(
@@ -163,4 +198,46 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  Future<dynamic> AddCategory(BuildContext context) => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Add category"),
+          content: TextField(
+            controller: categoryController,
+            maxLines: 1,
+            decoration: InputDecoration(
+              labelText: "Category",
+              labelStyle: TextStyle(
+                  color: ColorConstants.primaryColor,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(
+                    color: ColorConstants.primaryColor,
+                  )),
+              isDense: false, // Added this
+              contentPadding: EdgeInsets.all(20),
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  obj.addUserCategory(categoryController.text);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Category added success full")));
+                  setState(() {});
+                },
+                child: Text("Add"))
+          ],
+        ),
+      );
 }
