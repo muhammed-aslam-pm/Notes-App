@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:to_do_project_1/model/notes_model.dart';
 import 'package:to_do_project_1/utils/color_constants.dart';
 import '../../controller/home_screen_controller.dart';
-import '../../model/category_model.dart';
 import 'widgets/note_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,17 +13,51 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  var box = Hive.box('noteBox');
-  TextEditingController categoryController = TextEditingController();
-  CategoryController obj = CategoryController();
+  var noteBox = Hive.box<NotesModel>('noteBox');
+//category controller object
+  CategoryController catController = CategoryController();
+
+  //notes controller object
+  NotesController notesController = NotesController();
+
+// category list from hive category box
   List categories = [];
+  // Index of selected category
+  int categoryIndex = 0;
+//category controller
+  TextEditingController categoryController = TextEditingController();
+
+  // adding/editing form controllers
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  // adding/editing form key
+  final _formKey = GlobalKey<FormState>();
+
+  //Notes list
+
+  List<NotesModel> myNotes = [];
+  List<NotesModel> categorizedNotes = [];
+  Map<int, List<NotesModel>> groupedNotes = {};
 
   @override
   void initState() {
-    obj.initializeApp();
-    categories = obj.getAllCategories();
+    catController.initializeApp();
+    categories = catController.getAllCategories();
+    fetchData();
     // TODO: implement initState
     super.initState();
+  }
+
+  void fetchData() async {
+    myNotes = noteBox.values.toList();
+    categorizedNotes = notesController.getSortedNotesByCategory(list: myNotes);
+    for (var note in categorizedNotes) {
+      if (!groupedNotes.containsKey(note.category)) {
+        groupedNotes[note.category] = [];
+      }
+      groupedNotes[note.category]!.add(note);
+    }
+    setState(() {});
   }
 
   @override
@@ -43,16 +77,48 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Padding(
           padding: const EdgeInsets.only(top: 30, left: 20),
           child: ListView.separated(
-              itemBuilder: (context, index) => NoteWidgets(),
+              itemBuilder: (context, index) {
+                int category = groupedNotes.keys.elementAt(index);
+                List<NotesModel> notesInCategory = groupedNotes[category]!;
+                return Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        categories[groupedNotes.keys.elementAt(index)],
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: ColorConstants.primaryColor),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                            children: List.generate(notesInCategory.length,
+                                (inIndex) {
+                          return NoteWidgets(
+                              title: notesInCategory[inIndex].title,
+                              description: notesInCategory[inIndex].description,
+                              date: notesInCategory[inIndex].date);
+                        })),
+                      ),
+                    ],
+                  ),
+                );
+              },
               separatorBuilder: (context, index) => Divider(
                     height: 20,
                   ),
-              itemCount: 10),
+              itemCount: groupedNotes.length),
         ),
       ),
     );
   }
 
+// Bottom sheet extracted
   Future<dynamic> bottomSheet(BuildContext context) {
     return showModalBottomSheet(
       shape: const OutlineInputBorder(
@@ -64,134 +130,175 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       isScrollControlled: true,
       context: context,
-      builder: (context) => Padding(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                    labelText: "Title",
-                    labelStyle: TextStyle(
-                        color: ColorConstants.primaryColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(
-                          color: ColorConstants.primaryColor,
-                        )),
-                    isDense: false, // Added this
-                    contentPadding: EdgeInsets.all(20),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  height: 150,
-                  child: TextField(
-                    maxLines: null,
-                    expands: true,
-                    textAlignVertical: TextAlignVertical.top,
-                    textAlign: TextAlign.start,
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      hintText: "Description",
+      builder: (context) => StatefulBuilder(
+        builder: (context, InsetState) => Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextFormField(
+                      controller: titleController,
+                      maxLines: 1,
+                      decoration: InputDecoration(
+                        labelText: "Title",
+                        labelStyle: TextStyle(
+                            color: ColorConstants.primaryColor,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: ColorConstants.primaryColor,
+                            )),
+                        isDense: false, // Added this
+                        contentPadding: EdgeInsets.all(20),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the Title';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                      height: 150,
+                      child: TextFormField(
+                        controller: descriptionController,
+                        maxLines: null,
+                        expands: true,
+                        textAlignVertical: TextAlignVertical.top,
+                        textAlign: TextAlign.start,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          hintText: "Description",
 
-                      labelStyle: TextStyle(
+                          labelStyle: TextStyle(
+                              color: ColorConstants.primaryColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide(
+                                color: ColorConstants.primaryColor,
+                              )),
+                          isDense: false, // Added this
+                          contentPadding: EdgeInsets.all(20),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter description';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "Category",
+                      style: TextStyle(
                           color: ColorConstants.primaryColor,
                           fontSize: 20,
                           fontWeight: FontWeight.w700),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: ColorConstants.primaryColor,
-                          )),
-                      isDense: false, // Added this
-                      contentPadding: EdgeInsets.all(20),
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  "Category",
-                  style: TextStyle(
-                      color: ColorConstants.primaryColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(
-                        categories.length + 1,
-                        (index) => index == categories.length
-                            ? InkWell(
-                                onTap: () => AddCategory(context),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Text(
-                                    " + Add Category",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white),
-                                  ),
-                                ),
-                              )
-                            : Padding(
-                                padding: const EdgeInsets.only(right: 15),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: ColorConstants.secondaryColor3,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Text(
-                                    categories[index].toString(),
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white),
-                                  ),
-                                ),
-                              )),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll(
-                                ColorConstants.primaryColor)),
-                        onPressed: () {},
-                        child: Text("Add")),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(
+                            categories.length + 1,
+                            (index) => index == categories.length
+                                ? InkWell(
+                                    onTap: () => AddCategory(context),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                        vertical: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Text(
+                                        " + Add Category",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  )
+                                : Padding(
+                                    padding: const EdgeInsets.only(right: 15),
+                                    child: InkWell(
+                                      onTap: () {
+                                        categoryIndex = index;
+                                        InsetState(() {});
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 15,
+                                          vertical: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                            color: categoryIndex == index
+                                                ? Colors.black
+                                                : ColorConstants
+                                                    .secondaryColor3,
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: Text(
+                                          categories[index].toString(),
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  )),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStatePropertyAll(
+                                    ColorConstants.primaryColor)),
+                            onPressed: () {
+                              notesController.addNotes(
+                                  formkey: _formKey,
+                                  title: titleController.text,
+                                  description: descriptionController.text,
+                                  date: "12/12/23",
+                                  category: categoryIndex,
+                                  context: context,
+                                  descriptionController: descriptionController,
+                                  titleController: titleController,
+                                  fetchdata: fetchData);
+                            },
+                            child: Text("Add")),
+                      ],
+                    )
                   ],
-                )
-              ],
+                ),
+              ),
             ),
           ),
         ),
@@ -230,9 +337,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  obj.addUserCategory(categoryController.text);
+                  catController.addUserCategory(categoryController.text);
                   Navigator.pop(context);
-                  categories = obj.getAllCategories();
+                  categories = catController.getAllCategories();
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text("Category added success full")));
                   setState(() {});
