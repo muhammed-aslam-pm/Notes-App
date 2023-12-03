@@ -16,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var box = Hive.box('noteBox');
   TextEditingController categoryController = TextEditingController();
   CategoryController obj = CategoryController();
-  List<Category> categories = [];
+  List categories = [];
 
   @override
   void initState() {
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       color: ColorConstants.secondaryColor3,
                                       borderRadius: BorderRadius.circular(10)),
                                   child: Text(
-                                    categories[index].name,
+                                    categories[index].toString(),
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
@@ -232,6 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   obj.addUserCategory(categoryController.text);
                   Navigator.pop(context);
+                  categories = obj.getAllCategories();
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text("Category added success full")));
                   setState(() {});
