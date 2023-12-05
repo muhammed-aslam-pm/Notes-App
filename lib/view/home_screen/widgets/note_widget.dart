@@ -3,16 +3,17 @@ import 'package:to_do_project_1/controller/home_screen_controller.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
 
 class NoteWidgets extends StatelessWidget {
-  const NoteWidgets({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.date,
-  });
+  const NoteWidgets(
+      {super.key,
+      required this.title,
+      required this.description,
+      required this.date,
+      required this.onDelete});
 
   final String title;
   final String description;
   final String date;
+  final void Function()? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,7 @@ class NoteWidgets extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: onDelete,
                           icon: Icon(
                             Icons.delete,
                             color: Colors.white,

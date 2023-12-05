@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:to_do_project_1/model/notes_display_model.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
 import 'package:to_do_project_1/utils/color_constants.dart';
 import '../../controller/home_screen_controller.dart';
@@ -39,6 +41,11 @@ class _HomeScreenState extends State<HomeScreen> {
   List<NotesModel> categorizedNotes = [];
   Map<int, List<NotesModel>> groupedNotes = {};
 
+  List<NotesDisplayModel> notesDisplay = [];
+
+  //keys list
+  List myKeysList = [];
+
   @override
   void initState() {
     catController.initializeApp();
@@ -49,13 +56,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void fetchData() async {
+    myKeysList = await noteBox.keys.toList();
     myNotes = noteBox.values.toList();
-    categorizedNotes = notesController.getSortedNotesByCategory(list: myNotes);
-    for (var note in categorizedNotes) {
+
+    for (var n in myKeysList) {
+      notesDisplay.add(NotesDisplayModel(
+        title: noteBox.get(n)!.title,
+        description: noteBox.get(n)!.description,
+        date: noteBox.get(n)!.date,
+        category: noteBox.get(n)!.category,
+        key: n,
+      ));
+    }
+
+    for (var note in myNotes) {
       if (!groupedNotes.containsKey(note.category)) {
         groupedNotes[note.category] = [];
       }
-      groupedNotes[note.category]!.add(note);
+      if (!groupedNotes[note.category]!.contains(note)) {
+        groupedNotes[note.category]!.add(note);
+      }
     }
     setState(() {});
   }
@@ -78,14 +98,16 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(top: 30, left: 20),
           child: ListView.separated(
               itemBuilder: (context, index) {
-                int category = groupedNotes.keys.elementAt(index);
+                int category = groupedNotes.keys
+                    .elementAt(groupedNotes.length - index - 1);
                 List<NotesModel> notesInCategory = groupedNotes[category]!;
                 return Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        categories[groupedNotes.keys.elementAt(index)],
+                        categories[groupedNotes.keys
+                            .elementAt(groupedNotes.length - index - 1)],
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -100,9 +122,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: List.generate(notesInCategory.length,
                                 (inIndex) {
                           return NoteWidgets(
-                              title: notesInCategory[inIndex].title,
-                              description: notesInCategory[inIndex].description,
-                              date: notesInCategory[inIndex].date);
+                            title: notesInCategory[
+                                    notesInCategory.length - inIndex - 1]
+                                .title,
+                            description: notesInCategory[
+                                    notesInCategory.length - inIndex - 1]
+                                .description,
+                            date: notesInCategory[
+                                    notesInCategory.length - inIndex - 1]
+                                .date,
+                            onDelete: () {},
+                          );
                         })),
                       ),
                     ],
@@ -286,12 +316,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                   formkey: _formKey,
                                   title: titleController.text,
                                   description: descriptionController.text,
-                                  date: "12/12/23",
+                                  date: DateFormat('dd,MM,yyyy')
+                                      .format(DateTime.now())
+                                      .toString(),
                                   category: categoryIndex,
                                   context: context,
                                   descriptionController: descriptionController,
                                   titleController: titleController,
                                   fetchdata: fetchData);
+
+                              setState(() {});
                             },
                             child: Text("Add")),
                       ],
