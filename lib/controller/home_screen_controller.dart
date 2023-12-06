@@ -34,7 +34,8 @@ class CategoryController {
 }
 
 class NotesController {
-  final noteBox = Hive.box<NotesModel>('noteBox');
+  final noteBox = Hive.box('noteBox');
+
   void addNotes(
       {required GlobalKey<FormState> formkey,
       required String title,
@@ -46,15 +47,62 @@ class NotesController {
       required BuildContext context,
       required void fetchdata()}) {
     if (formkey.currentState!.validate()) {
-      noteBox.add(NotesModel(
-          title: title,
-          description: description,
-          date: date,
-          category: category));
+      var note;
+      List<NotesModel> currentNotes = [];
+      if (noteBox.containsKey(category)) {
+        currentNotes = noteBox.get(category);
+        note = NotesModel(
+            title: title,
+            description: description,
+            date: date,
+            category: category);
+        currentNotes.add(note);
+
+        noteBox.put(category, currentNotes);
+      } else {
+        note = NotesModel(
+            title: title,
+            description: description,
+            date: date,
+            category: category);
+        currentNotes.add(note);
+
+        noteBox.put(category, currentNotes);
+      }
+      // noteBox.add(NotesModel(
+      //     title: title,
+      //     description: description,
+      //     date: date,
+      //     category: category));
       titleController.clear();
       descriptionController.clear();
       Navigator.pop(context);
       fetchdata();
+    }
+  }
+
+  void deleteNote(
+      {required var key,
+      required NotesModel note,
+      required void fetchData(),
+      required int index}) {
+    List<NotesModel> list = noteBox.get(key)!.cast<NotesModel>();
+    if (list.length == 1) {
+      print("befor:  $list");
+      list.removeAt(index);
+      print("after:  $list");
+      noteBox.put(key, list);
+      print("updated : ${noteBox.get(key)}");
+      noteBox.delete(key);
+      fetchData;
+    } else {
+      print("befor:  $list");
+      list.removeAt(index);
+      print("after:  $list");
+      noteBox.put(key, list);
+      print("updated : ${noteBox.get(key)}");
+
+      fetchData;
     }
   }
 

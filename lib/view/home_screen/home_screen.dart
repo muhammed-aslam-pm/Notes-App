@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  var noteBox = Hive.box<NotesModel>('noteBox');
+  var noteBox = Hive.box('noteBox');
 //category controller object
   CategoryController catController = CategoryController();
 
@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<NotesModel> myNotes = [];
   List<NotesModel> categorizedNotes = [];
-  Map<int, List<NotesModel>> groupedNotes = {};
+  Map<int, List<NotesDisplayModel>> groupedNotes = {};
 
   List<NotesDisplayModel> notesDisplay = [];
 
@@ -57,26 +57,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void fetchData() async {
     myKeysList = await noteBox.keys.toList();
-    myNotes = noteBox.values.toList();
+    // myNotes = noteBox.values.toList();
 
-    for (var n in myKeysList) {
-      notesDisplay.add(NotesDisplayModel(
-        title: noteBox.get(n)!.title,
-        description: noteBox.get(n)!.description,
-        date: noteBox.get(n)!.date,
-        category: noteBox.get(n)!.category,
-        key: n,
-      ));
-    }
+    // for (var n in myKeysList) {
+    //   var newNote = NotesDisplayModel(
+    //     title: noteBox.get(n)!.title,
+    //     description: noteBox.get(n)!.description,
+    //     date: noteBox.get(n)!.date,
+    //     category: noteBox.get(n)!.category,
+    //     key: n,
+    //   );
+    //   if (!notesDisplay.contains(newNote)) {
+    //     notesDisplay.add(newNote);
+    //   }
+    // }
 
-    for (var note in myNotes) {
-      if (!groupedNotes.containsKey(note.category)) {
-        groupedNotes[note.category] = [];
-      }
-      if (!groupedNotes[note.category]!.contains(note)) {
-        groupedNotes[note.category]!.add(note);
-      }
-    }
+    // for (var note in notesDisplay) {
+    //   if (!groupedNotes.containsKey(note.category)) {
+    //     groupedNotes[note.category] = [];
+    //   }
+    //   if (!groupedNotes[note.category]!.contains(note)) {
+    //     groupedNotes[note.category]!.add(note);
+    //   }
+    // }
     setState(() {});
   }
 
@@ -98,16 +101,21 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(top: 30, left: 20),
           child: ListView.separated(
               itemBuilder: (context, index) {
-                int category = groupedNotes.keys
-                    .elementAt(groupedNotes.length - index - 1);
-                List<NotesModel> notesInCategory = groupedNotes[category]!;
+                // int category = groupedNotes.keys
+                //     .elementAt(groupedNotes.length - index - 1);
+                // List<NotesDisplayModel> notesInCategory =
+                //     groupedNotes[category]!;
+                List<NotesModel> notesInCategory =
+                    noteBox.get(myKeysList[index])!.cast<NotesModel>();
+
                 return Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        categories[groupedNotes.keys
-                            .elementAt(groupedNotes.length - index - 1)],
+                        // categories[groupedNotes.keys
+                        //     .elementAt(groupedNotes.length - index - 1)],
+                        categories[myKeysList[index]],
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -131,7 +139,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             date: notesInCategory[
                                     notesInCategory.length - inIndex - 1]
                                 .date,
-                            onDelete: () {},
+                            onDelete: () {
+                              notesController.deleteNote(
+                                  key: myKeysList[inIndex],
+                                  note: notesInCategory[
+                                      notesInCategory.length - inIndex - 1],
+                                  fetchData: fetchData,
+                                  index: notesInCategory.length - inIndex - 1);
+                              fetchData();
+                              setState(() {});
+                            },
                           );
                         })),
                       ),
@@ -142,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
               separatorBuilder: (context, index) => Divider(
                     height: 20,
                   ),
-              itemCount: groupedNotes.length),
+              itemCount: myKeysList.length),
         ),
       ),
     );

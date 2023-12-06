@@ -8,7 +8,7 @@ Future<void> main() async {
   await Hive.initFlutter();
   var catBox = await Hive.openBox('categories');
   Hive.registerAdapter(NotesModelAdapter());
-  var box = await Hive.openBox<NotesModel>('noteBox');
+  var box = await Hive.openBox('noteBox');
 
   runApp(MyApp());
 }
