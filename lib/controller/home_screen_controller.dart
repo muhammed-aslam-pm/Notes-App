@@ -100,4 +100,35 @@ class NotesController {
       noteBox.delete(key);
     }
   }
+
+  void editNote({
+    required String title,
+    required String description,
+    required String date,
+    required int category,
+    required GlobalKey<FormState> formkey,
+    required int indexOfNote,
+    required int oldCategory,
+  }) {
+    List<NotesModel> currentNotes =
+        noteBox.get(oldCategory)?.cast<NotesModel>() ?? [];
+    NotesModel note = NotesModel(
+      title: title,
+      description: description,
+      date: date.toString(),
+      category: category,
+    );
+
+    currentNotes.removeAt(indexOfNote);
+    noteBox.put(oldCategory, currentNotes);
+
+    if (currentNotes.isEmpty) {
+      noteBox.delete(oldCategory);
+    }
+
+    List<NotesModel> updatedNotes =
+        noteBox.get(category)?.cast<NotesModel>() ?? [];
+    updatedNotes.add(note);
+    noteBox.put(category, updatedNotes);
+  }
 }

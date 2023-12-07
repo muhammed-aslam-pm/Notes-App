@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:to_do_project_1/controller/home_screen_controller.dart';
-import 'package:to_do_project_1/model/notes_model.dart';
 
 class NoteWidgets extends StatelessWidget {
   const NoteWidgets(
@@ -8,12 +6,14 @@ class NoteWidgets extends StatelessWidget {
       required this.title,
       required this.description,
       required this.date,
-      required this.onDelete});
+      required this.onDelete,
+      required this.onUpdate});
 
   final String title;
   final String description;
   final String date;
   final void Function()? onDelete;
+  final void Function()? onUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class NoteWidgets extends StatelessWidget {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: onUpdate,
                           icon: Icon(
                             Icons.edit,
                             color: Colors.white,

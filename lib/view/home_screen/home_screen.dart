@@ -37,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
   //keys list
   List myKeysList = [];
 
+  bool isEditing = false;
+
   @override
   void initState() {
     catController.initializeApp();
@@ -105,12 +107,33 @@ class _HomeScreenState extends State<HomeScreen> {
                               print(
                                   "index1: ${notesInCategory.length - inIndex - 1}");
                               notesController.deleteNote(
-                                  key: myKeysList[index],
-                                  note: notesInCategory[
-                                      notesInCategory.length - inIndex - 1],
-                                  fetchData: fetchData,
-                                  index: notesInCategory.length - inIndex - 1);
+                                key: myKeysList[index],
+                                note: notesInCategory[
+                                    notesInCategory.length - inIndex - 1],
+                                fetchData: fetchData,
+                                index: notesInCategory.length - inIndex - 1,
+                              );
                               fetchData();
+                              setState(() {});
+                            },
+                            onUpdate: () {
+                              titleController.text = notesInCategory[
+                                      notesInCategory.length - inIndex - 1]
+                                  .title;
+                              descriptionController.text = notesInCategory[
+                                      notesInCategory.length - inIndex - 1]
+                                  .description;
+                              categoryIndex = notesInCategory[
+                                      notesInCategory.length - inIndex - 1]
+                                  .category;
+                              isEditing = true;
+                              bottomSheet(context,
+                                  key: myKeysList[index],
+                                  indexOfEditing:
+                                      notesInCategory.length - inIndex - 1,
+                                  currentCategory: notesInCategory[
+                                          notesInCategory.length - inIndex - 1]
+                                      .category);
                               setState(() {});
                             },
                           );
@@ -130,7 +153,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 // Bottom sheet extracted
-  Future<dynamic> bottomSheet(BuildContext context) {
+  Future<dynamic> bottomSheet(BuildContext context,
+      {var key, int? indexOfEditing, int? currentCategory}) {
     return showModalBottomSheet(
       shape: const OutlineInputBorder(
         borderSide: BorderSide(width: 0),
@@ -289,26 +313,58 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
+                            onPressed: () {
+                              titleController.clear();
+                              descriptionController.clear();
+                              Navigator.pop(context);
+                              isEditing = false;
+                              setState(() {});
+                            },
+                            child: Text("Cancel")),
+                        SizedBox(
+                          width: 30,
+                        ),
+                        ElevatedButton(
                             style: ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
                                     ColorConstants.primaryColor)),
                             onPressed: () {
-                              notesController.addNotes(
-                                  formkey: _formKey,
-                                  title: titleController.text,
-                                  description: descriptionController.text,
-                                  date: DateFormat('dd,MM,yyyy')
-                                      .format(DateTime.now())
-                                      .toString(),
-                                  category: categoryIndex,
-                                  context: context,
-                                  descriptionController: descriptionController,
-                                  titleController: titleController,
-                                  fetchdata: fetchData);
+                              if (isEditing) {
+                                notesController.editNote(
+                                    title: titleController.text,
+                                    description: descriptionController.text,
+                                    date: DateFormat('dd,MM,yyyy')
+                                        .format(DateTime.now())
+                                        .toString(),
+                                    category: categoryIndex,
+                                    oldCategory: currentCategory!,
+                                    formkey: _formKey,
+                                    indexOfNote: indexOfEditing!);
+                                isEditing = false;
+                                titleController.clear();
+                                descriptionController.clear();
+                                fetchData();
+                                categoryIndex = 0;
+                                Navigator.pop(context);
+                              } else {
+                                notesController.addNotes(
+                                    formkey: _formKey,
+                                    title: titleController.text,
+                                    description: descriptionController.text,
+                                    date: DateFormat('dd,MM,yyyy')
+                                        .format(DateTime.now())
+                                        .toString(),
+                                    category: categoryIndex,
+                                    context: context,
+                                    descriptionController:
+                                        descriptionController,
+                                    titleController: titleController,
+                                    fetchdata: fetchData);
 
-                              setState(() {});
+                                setState(() {});
+                              }
                             },
-                            child: Text("Add")),
+                            child: isEditing ? Text("Edit") : Text("Add")),
                       ],
                     )
                   ],
