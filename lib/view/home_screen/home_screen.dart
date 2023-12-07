@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:to_do_project_1/model/notes_display_model.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
 import 'package:to_do_project_1/utils/color_constants.dart';
 import '../../controller/home_screen_controller.dart';
@@ -35,14 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // adding/editing form key
   final _formKey = GlobalKey<FormState>();
 
-  //Notes list
-
-  List<NotesModel> myNotes = [];
-  List<NotesModel> categorizedNotes = [];
-  Map<int, List<NotesDisplayModel>> groupedNotes = {};
-
-  List<NotesDisplayModel> notesDisplay = [];
-
   //keys list
   List myKeysList = [];
 
@@ -57,29 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void fetchData() async {
     myKeysList = await noteBox.keys.toList();
-    // myNotes = noteBox.values.toList();
-
-    // for (var n in myKeysList) {
-    //   var newNote = NotesDisplayModel(
-    //     title: noteBox.get(n)!.title,
-    //     description: noteBox.get(n)!.description,
-    //     date: noteBox.get(n)!.date,
-    //     category: noteBox.get(n)!.category,
-    //     key: n,
-    //   );
-    //   if (!notesDisplay.contains(newNote)) {
-    //     notesDisplay.add(newNote);
-    //   }
-    // }
-
-    // for (var note in notesDisplay) {
-    //   if (!groupedNotes.containsKey(note.category)) {
-    //     groupedNotes[note.category] = [];
-    //   }
-    //   if (!groupedNotes[note.category]!.contains(note)) {
-    //     groupedNotes[note.category]!.add(note);
-    //   }
-    // }
     setState(() {});
   }
 
@@ -101,10 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(top: 30, left: 20),
           child: ListView.separated(
               itemBuilder: (context, index) {
-                // int category = groupedNotes.keys
-                //     .elementAt(groupedNotes.length - index - 1);
-                // List<NotesDisplayModel> notesInCategory =
-                //     groupedNotes[category]!;
                 List<NotesModel> notesInCategory =
                     noteBox.get(myKeysList[index])!.cast<NotesModel>();
 
@@ -113,8 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        // categories[groupedNotes.keys
-                        //     .elementAt(groupedNotes.length - index - 1)],
                         categories[myKeysList[index]],
                         style: TextStyle(
                             fontSize: 20,
@@ -140,8 +102,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     notesInCategory.length - inIndex - 1]
                                 .date,
                             onDelete: () {
+                              print(
+                                  "index1: ${notesInCategory.length - inIndex - 1}");
                               notesController.deleteNote(
-                                  key: myKeysList[inIndex],
+                                  key: myKeysList[index],
                                   note: notesInCategory[
                                       notesInCategory.length - inIndex - 1],
                                   fetchData: fetchData,

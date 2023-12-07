@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
@@ -69,11 +67,6 @@ class NotesController {
 
         noteBox.put(category, currentNotes);
       }
-      // noteBox.add(NotesModel(
-      //     title: title,
-      //     description: description,
-      //     date: date,
-      //     category: category));
       titleController.clear();
       descriptionController.clear();
       Navigator.pop(context);
@@ -81,33 +74,30 @@ class NotesController {
     }
   }
 
-  void deleteNote(
-      {required var key,
-      required NotesModel note,
-      required void fetchData(),
-      required int index}) {
+  void deleteNote({
+    required var key,
+    required NotesModel note,
+    required void Function() fetchData,
+    required int index,
+  }) {
     List<NotesModel> list = noteBox.get(key)!.cast<NotesModel>();
-    if (list.length == 1) {
-      print("befor:  $list");
-      list.removeAt(index);
-      print("after:  $list");
-      noteBox.put(key, list);
-      print("updated : ${noteBox.get(key)}");
-      noteBox.delete(key);
-      fetchData;
-    } else {
-      print("befor:  $list");
-      list.removeAt(index);
-      print("after:  $list");
-      noteBox.put(key, list);
-      print("updated : ${noteBox.get(key)}");
+    print("before: $list");
+    print("index: $index");
+    print("lis length  : ${list.length}");
 
-      fetchData;
+    if (index < 0 || index >= list.length) {
+      print("Invalid index: $index. Index out of range.");
+      return; // Exit the function if index is out of range
     }
-  }
 
-  List<NotesModel> getSortedNotesByCategory({required List<NotesModel> list}) {
-    list.sort((a, b) => a.category.compareTo(b.category));
-    return list;
+    print("before2: $list");
+    list.remove(note);
+    print("after: $list");
+    noteBox.put(key, list);
+    print("updated: ${noteBox.get(key)}");
+
+    if (list.length == 0) {
+      noteBox.delete(key);
+    }
   }
 }
