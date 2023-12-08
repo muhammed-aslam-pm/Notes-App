@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_project_1/utils/color_constants.dart';
 
 class NoteWidgets extends StatelessWidget {
   const NoteWidgets(
@@ -18,12 +19,13 @@ class NoteWidgets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20),
+      padding: const EdgeInsets.only(right: 20),
       child: Container(
         height: 200,
         width: MediaQuery.sizeOf(context).width - 80,
         decoration: BoxDecoration(
-            color: Colors.amber, borderRadius: BorderRadius.circular(20)),
+            color: ColorConstants.primaryCardColor,
+            borderRadius: BorderRadius.circular(20)),
         padding: EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

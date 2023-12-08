@@ -38,39 +38,28 @@ class NotesController {
       {required GlobalKey<FormState> formkey,
       required String title,
       required String description,
-      required date,
+      required String date,
       required int category,
       required TextEditingController titleController,
-      required TextEditingController descriptionController,
-      required BuildContext context,
-      required void fetchdata()}) {
+      required TextEditingController desController,
+      required BuildContext context}) {
     if (formkey.currentState!.validate()) {
-      var note;
-      List<NotesModel> currentNotes = [];
-      if (noteBox.containsKey(category)) {
-        currentNotes = noteBox.get(category);
-        note = NotesModel(
-            title: title,
-            description: description,
-            date: date,
-            category: category);
-        currentNotes.add(note);
+      List<NotesModel> currentNotes = noteBox.containsKey(category)
+          ? noteBox.get(category)!.cast<NotesModel>()
+          : []; // Initialize as an empty list if category doesn't exist
 
-        noteBox.put(category, currentNotes);
-      } else {
-        note = NotesModel(
-            title: title,
-            description: description,
-            date: date,
-            category: category);
-        currentNotes.add(note);
+      var note = NotesModel(
+        title: title,
+        description: description,
+        date: date,
+        category: category,
+      );
 
-        noteBox.put(category, currentNotes);
-      }
+      currentNotes.add(note);
+      noteBox.put(category, currentNotes);
       titleController.clear();
-      descriptionController.clear();
+      desController.clear();
       Navigator.pop(context);
-      fetchdata();
     }
   }
 

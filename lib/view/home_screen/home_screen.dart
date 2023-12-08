@@ -56,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColorConstants.primaryBackgroundColor,
       floatingActionButton: FloatingActionButton(
         shape: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -156,6 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<dynamic> bottomSheet(BuildContext context,
       {var key, int? indexOfEditing, int? currentCategory}) {
     return showModalBottomSheet(
+      backgroundColor: ColorConstants.primaryBackgroundColor,
       shape: const OutlineInputBorder(
         borderSide: BorderSide(width: 0),
         borderRadius: BorderRadius.only(
@@ -184,8 +186,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         labelText: "Title",
                         labelStyle: TextStyle(
                             color: ColorConstants.primaryColor,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700),
+                            fontWeight: FontWeight.w500),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: ColorConstants.primaryColor, width: 2),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                             borderSide: BorderSide(
@@ -214,12 +220,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         textAlign: TextAlign.start,
                         keyboardType: TextInputType.multiline,
                         decoration: InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: ColorConstants.primaryColor, width: 2),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           hintText: "Description",
+                          hintStyle:
+                              TextStyle(color: ColorConstants.primaryColor),
 
-                          labelStyle: TextStyle(
-                              color: ColorConstants.primaryColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
                               borderSide: BorderSide(
@@ -291,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             color: categoryIndex == index
                                                 ? Colors.black
                                                 : ColorConstants
-                                                    .secondaryColor3,
+                                                    .primaryCardColor,
                                             borderRadius:
                                                 BorderRadius.circular(10)),
                                         child: Text(
@@ -312,59 +321,69 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ElevatedButton(
-                            onPressed: () {
-                              titleController.clear();
-                              descriptionController.clear();
-                              Navigator.pop(context);
-                              isEditing = false;
-                              setState(() {});
-                            },
-                            child: Text("Cancel")),
+                        SizedBox(
+                          width: 80,
+                          child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      ColorConstants.primaryColor)),
+                              onPressed: () {
+                                titleController.clear();
+                                descriptionController.clear();
+                                Navigator.pop(context);
+                                isEditing = false;
+                                setState(() {});
+                              },
+                              child: Text("Cancel")),
+                        ),
                         SizedBox(
                           width: 30,
                         ),
-                        ElevatedButton(
-                            style: ButtonStyle(
-                                backgroundColor: MaterialStatePropertyAll(
-                                    ColorConstants.primaryColor)),
-                            onPressed: () {
-                              if (isEditing) {
-                                notesController.editNote(
-                                    title: titleController.text,
-                                    description: descriptionController.text,
-                                    date: DateFormat('dd,MM,yyyy')
-                                        .format(DateTime.now())
-                                        .toString(),
-                                    category: categoryIndex,
-                                    oldCategory: currentCategory!,
-                                    formkey: _formKey,
-                                    indexOfNote: indexOfEditing!);
-                                isEditing = false;
-                                titleController.clear();
-                                descriptionController.clear();
-                                fetchData();
-                                categoryIndex = 0;
-                                Navigator.pop(context);
-                              } else {
-                                notesController.addNotes(
-                                    formkey: _formKey,
-                                    title: titleController.text,
-                                    description: descriptionController.text,
-                                    date: DateFormat('dd,MM,yyyy')
-                                        .format(DateTime.now())
-                                        .toString(),
-                                    category: categoryIndex,
-                                    context: context,
-                                    descriptionController:
-                                        descriptionController,
-                                    titleController: titleController,
-                                    fetchdata: fetchData);
+                        SizedBox(
+                          width: 80,
+                          child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      ColorConstants.primaryColor)),
+                              onPressed: () {
+                                if (isEditing) {
+                                  notesController.editNote(
+                                      title: titleController.text,
+                                      description: descriptionController.text,
+                                      date: DateFormat('dd,MM,yyyy')
+                                          .format(DateTime.now())
+                                          .toString(),
+                                      category: categoryIndex,
+                                      oldCategory: currentCategory!,
+                                      formkey: _formKey,
+                                      indexOfNote: indexOfEditing!);
+                                  isEditing = false;
+                                  titleController.clear();
+                                  descriptionController.clear();
+                                  fetchData();
+                                  categoryIndex = 0;
+                                  Navigator.pop(context);
+                                } else {
+                                  notesController.addNotes(
+                                      formkey: _formKey,
+                                      title: titleController.text,
+                                      description: descriptionController.text,
+                                      date: DateFormat('dd,MM,yyyy')
+                                          .format(DateTime.now())
+                                          .toString(),
+                                      category: categoryIndex,
+                                      context: context,
+                                      desController: descriptionController,
+                                      titleController: titleController);
 
-                                setState(() {});
-                              }
-                            },
-                            child: isEditing ? Text("Edit") : Text("Add")),
+                                  fetchData();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Note added ")));
+                                  setState(() {});
+                                }
+                              },
+                              child: isEditing ? Text("Edit") : Text("Add")),
+                        ),
                       ],
                     )
                   ],
@@ -386,10 +405,14 @@ class _HomeScreenState extends State<HomeScreen> {
             maxLines: 1,
             decoration: InputDecoration(
               labelText: "Category",
+              focusedBorder: OutlineInputBorder(
+                borderSide:
+                    BorderSide(color: ColorConstants.primaryColor, width: 2),
+                borderRadius: BorderRadius.circular(15),
+              ),
               labelStyle: TextStyle(
-                  color: ColorConstants.primaryColor,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600),
+                color: ColorConstants.primaryColor,
+              ),
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                   borderSide: BorderSide(
@@ -401,14 +424,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: [
             ElevatedButton(
+              style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStatePropertyAll(ColorConstants.primaryColor)),
               onPressed: () {
+                categoryController.clear();
                 Navigator.pop(context);
               },
               child: Text("Cancel"),
             ),
             ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStatePropertyAll(ColorConstants.primaryColor)),
                 onPressed: () {
                   catController.addUserCategory(categoryController.text);
+                  categoryController.clear();
                   Navigator.pop(context);
                   categories = catController.getAllCategories();
                   ScaffoldMessenger.of(context).showSnackBar(

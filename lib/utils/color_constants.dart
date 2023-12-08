@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ColorConstants {
-  static Color primaryColor = Color(0xff586f6b);
-  static Color primaryBackgroundColor = Color(0xffddd5d0);
+  static Color primaryColor = Colors.black;
+  static Color primaryBackgroundColor = Colors.white;
   static Color secondaryColor1 = Color(0xffcfc0bd);
   static Color secondaryColor2 = Color(0xffb8b8aa);
-  static Color secondaryColor3 = Color(0xff7f9183);
+  static Color primaryCardColor = Color(0xff7f9183);
 }
