@@ -104,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             date: notesInCategory[
                                     notesInCategory.length - inIndex - 1]
                                 .date,
+                            category: categories[myKeysList[index]],
                             onDelete: () {
                               print(
                                   "index1: ${notesInCategory.length - inIndex - 1}");
