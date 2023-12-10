@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
+import 'package:to_do_project_1/view/home_screen/widgets/add_category_dialog.dart';
 
 class CategoryController {
   final CatBox = Hive.box('categories');
@@ -28,6 +30,21 @@ class CategoryController {
   // Function to get all categories
   List getAllCategories() {
     return CatBox.values.toList();
+  }
+
+  addCategory({
+    required BuildContext context,
+    required TextEditingController categoryController,
+    required CategoryController catController,
+    required void Function() fetchdata,
+  }) {
+    return showDialog(
+      context: context,
+      builder: (context) => AddCategoryDialog(
+          categoryController: categoryController,
+          catController: catController,
+          fetchdata: fetchdata),
+    );
   }
 }
 

@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
 import 'package:to_do_project_1/utils/color_constants.dart';
+import 'package:to_do_project_1/view/home_screen/widgets/add_category_dialog.dart';
 import '../../controller/home_screen_controller.dart';
 import 'widgets/note_widget.dart';
 
@@ -50,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void fetchData() async {
     myKeysList = await noteBox.keys.toList();
+    categories = catController.getAllCategories();
     setState(() {});
   }
 
@@ -266,7 +268,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             categories.length + 1,
                             (index) => index == categories.length
                                 ? InkWell(
-                                    onTap: () => AddCategory(context),
+                                    onTap: () => catController.addCategory(
+                                        context: context,
+                                        categoryController: categoryController,
+                                        catController: catController,
+                                        fetchdata: fetchData),
                                     child: Container(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 15,
@@ -396,59 +402,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  Future<dynamic> AddCategory(BuildContext context) => showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Add category"),
-          content: TextField(
-            controller: categoryController,
-            maxLines: 1,
-            decoration: InputDecoration(
-              labelText: "Category",
-              focusedBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: ColorConstants.primaryColor, width: 2),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              labelStyle: TextStyle(
-                color: ColorConstants.primaryColor,
-              ),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(
-                    color: ColorConstants.primaryColor,
-                  )),
-              isDense: false, // Added this
-              contentPadding: EdgeInsets.all(20),
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStatePropertyAll(ColorConstants.primaryColor)),
-              onPressed: () {
-                categoryController.clear();
-                Navigator.pop(context);
-              },
-              child: Text("Cancel"),
-            ),
-            ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStatePropertyAll(ColorConstants.primaryColor)),
-                onPressed: () {
-                  catController.addUserCategory(categoryController.text);
-                  categoryController.clear();
-                  Navigator.pop(context);
-                  categories = catController.getAllCategories();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Category added success full")));
-                  setState(() {});
-                },
-                child: Text("Add"))
-          ],
-        ),
-      );
 }
