@@ -76,7 +76,6 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, index) {
                 List<NotesModel> notesInCategory =
                     noteBox.get(myKeysList[index])!.cast<NotesModel>();
-
                 return Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,54 +93,59 @@ class _HomeScreenState extends State<HomeScreen> {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                            children: List.generate(notesInCategory.length,
-                                (inIndex) {
-                          return NoteWidgets(
-                            title: notesInCategory[
-                                    notesInCategory.length - inIndex - 1]
-                                .title,
-                            description: notesInCategory[
-                                    notesInCategory.length - inIndex - 1]
-                                .description,
-                            date: notesInCategory[
-                                    notesInCategory.length - inIndex - 1]
-                                .date,
-                            category: categories[myKeysList[index]],
-                            onDelete: () {
-                              print(
-                                  "index1: ${notesInCategory.length - inIndex - 1}");
-                              notesController.deleteNote(
-                                key: myKeysList[index],
-                                note: notesInCategory[
-                                    notesInCategory.length - inIndex - 1],
-                                fetchData: fetchData,
-                                index: notesInCategory.length - inIndex - 1,
-                              );
-                              fetchData();
-                              setState(() {});
-                            },
-                            onUpdate: () {
-                              titleController.text = notesInCategory[
-                                      notesInCategory.length - inIndex - 1]
-                                  .title;
-                              descriptionController.text = notesInCategory[
-                                      notesInCategory.length - inIndex - 1]
-                                  .description;
-                              categoryIndex = notesInCategory[
-                                      notesInCategory.length - inIndex - 1]
-                                  .category;
-                              isEditing = true;
-                              bottomSheet(context,
-                                  key: myKeysList[index],
-                                  indexOfEditing:
-                                      notesInCategory.length - inIndex - 1,
-                                  currentCategory: notesInCategory[
+                          children: List.generate(
+                            notesInCategory.length,
+                            (inIndex) {
+                              return NoteWidgets(
+                                title: notesInCategory[
+                                        notesInCategory.length - inIndex - 1]
+                                    .title,
+                                description: notesInCategory[
+                                        notesInCategory.length - inIndex - 1]
+                                    .description,
+                                date: notesInCategory[
+                                        notesInCategory.length - inIndex - 1]
+                                    .date,
+                                category: categories[myKeysList[index]],
+                                onDelete: () {
+                                  print(
+                                      "index1: ${notesInCategory.length - inIndex - 1}");
+                                  notesController.deleteNote(
+                                    key: myKeysList[index],
+                                    note: notesInCategory[
+                                        notesInCategory.length - inIndex - 1],
+                                    fetchData: fetchData,
+                                    index: notesInCategory.length - inIndex - 1,
+                                  );
+                                  fetchData();
+                                  setState(() {});
+                                },
+                                onUpdate: () {
+                                  titleController.text = notesInCategory[
                                           notesInCategory.length - inIndex - 1]
-                                      .category);
-                              setState(() {});
+                                      .title;
+                                  descriptionController.text = notesInCategory[
+                                          notesInCategory.length - inIndex - 1]
+                                      .description;
+                                  categoryIndex = notesInCategory[
+                                          notesInCategory.length - inIndex - 1]
+                                      .category;
+                                  isEditing = true;
+                                  bottomSheet(context,
+                                      key: myKeysList[index],
+                                      indexOfEditing:
+                                          notesInCategory.length - inIndex - 1,
+                                      currentCategory: notesInCategory[
+                                              notesInCategory.length -
+                                                  inIndex -
+                                                  1]
+                                          .category);
+                                  setState(() {});
+                                },
+                              );
                             },
-                          );
-                        })),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -296,6 +300,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: InkWell(
                                       onTap: () {
                                         categoryIndex = index;
+                                        InsetState(() {});
+                                      },
+                                      onLongPress: () {
+                                        print(index);
+                                        print(categories[index].toString());
+                                        catController.removeCategory(
+                                            catIndex: index,
+                                            catName:
+                                                categories[index].toString(),
+                                            context: context,
+                                            fetchData: fetchData);
+                                        fetchData();
+
+                                        setState(() {});
                                         InsetState(() {});
                                       },
                                       child: Container(

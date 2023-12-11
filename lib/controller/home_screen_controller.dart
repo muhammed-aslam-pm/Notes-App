@@ -4,15 +4,16 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:share/share.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
 import 'package:to_do_project_1/view/home_screen/widgets/add_category_dialog.dart';
+import 'package:to_do_project_1/view/home_screen/widgets/remove_category_dialog.dart';
 
 class CategoryController {
   final CatBox = Hive.box('categories');
+  final noteBox = Hive.box('noteBox');
   void initializeApp() async {
     // List of default categories
     List<String> defaultCategories = ['Work', 'Personal', 'Ideas'];
 
     // Check if categories already exist
-
     bool categoriesExist = CatBox.isNotEmpty;
 
     // If default categories don't exist, add them
@@ -45,6 +46,27 @@ class CategoryController {
           categoryController: categoryController,
           catController: catController,
           fetchdata: fetchdata),
+    );
+  }
+
+  removeUserCategory({required int catIndex, required Function() fetchData}) {
+    print(catIndex);
+    print(CatBox.get(catIndex));
+    print(noteBox.get(catIndex));
+    noteBox.delete(catIndex);
+    CatBox.delete(catIndex);
+    fetchData();
+  }
+
+  removeCategory(
+      {required int catIndex,
+      required String catName,
+      required BuildContext context,
+      required void Function() fetchData}) {
+    return showDialog(
+      context: context,
+      builder: (context) => RemoveCategoryDialog(
+          categoryName: catName, categoryIndex: catIndex, fetchData: fetchData),
     );
   }
 }
