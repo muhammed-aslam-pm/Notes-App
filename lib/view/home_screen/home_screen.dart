@@ -3,7 +3,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
 import 'package:to_do_project_1/utils/color_constants.dart';
-import 'package:to_do_project_1/view/home_screen/widgets/add_category_dialog.dart';
 import '../../controller/home_screen_controller.dart';
 import 'widgets/note_widget.dart';
 
@@ -24,8 +23,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // category list from hive category box
   List categories = [];
+
   // Index of selected category
   int categoryIndex = 0;
+
 //category controller
   TextEditingController categoryController = TextEditingController();
 
