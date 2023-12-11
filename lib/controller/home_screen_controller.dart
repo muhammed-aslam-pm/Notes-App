@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:share/share.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
 import 'package:to_do_project_1/view/home_screen/widgets/add_category_dialog.dart';
 
@@ -136,5 +137,9 @@ class NotesController {
         noteBox.get(category)?.cast<NotesModel>() ?? [];
     updatedNotes.add(note);
     noteBox.put(category, updatedNotes);
+  }
+
+  void shareNote({required String Note}) {
+    Share.share(Note);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_project_1/controller/home_screen_controller.dart';
 import 'package:to_do_project_1/utils/color_constants.dart';
 import 'package:to_do_project_1/view/note_page/note_page.dart';
 
@@ -98,7 +99,11 @@ class NoteWidgets extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        String note =
+                            "$title \n\n $description \n \n                          $date";
+                        NotesController().shareNote(Note: note);
+                      },
                       icon: Icon(
                         Icons.share,
                         color: Colors.white,
