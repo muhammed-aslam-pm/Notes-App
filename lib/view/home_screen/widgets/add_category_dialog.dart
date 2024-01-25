@@ -16,7 +16,7 @@ class AddCategoryDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Add category"),
+      title: const Text("Add category"),
       content: TextField(
         controller: categoryController,
         maxLines: 1,
@@ -36,34 +36,38 @@ class AddCategoryDialog extends StatelessWidget {
                 color: ColorConstants.primaryColor,
               )),
           isDense: false, // Added this
-          contentPadding: EdgeInsets.all(20),
+          contentPadding: const EdgeInsets.all(20),
         ),
       ),
       actions: [
         ElevatedButton(
           style: ButtonStyle(
-              backgroundColor:
-                  MaterialStatePropertyAll(ColorConstants.primaryColor)),
+            backgroundColor:
+                MaterialStatePropertyAll(ColorConstants.primaryColor),
+            foregroundColor: const MaterialStatePropertyAll(Colors.white),
+          ),
           onPressed: () {
             categoryController.clear();
             Navigator.pop(context);
           },
-          child: Text("Cancel"),
+          child: const Text("Cancel"),
         ),
         ElevatedButton(
             style: ButtonStyle(
-                backgroundColor:
-                    MaterialStatePropertyAll(ColorConstants.primaryColor)),
+              backgroundColor:
+                  MaterialStatePropertyAll(ColorConstants.primaryColor),
+              foregroundColor: const MaterialStatePropertyAll(Colors.white),
+            ),
             onPressed: () {
               catController.addUserCategory(categoryController.text);
               categoryController.clear();
               Navigator.pop(context);
 
               ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Category added success full")));
+                  const SnackBar(content: Text("Category added success full")));
               fetchdata();
             },
-            child: Text("Add"))
+            child: const Text("Add"))
       ],
     );
   }

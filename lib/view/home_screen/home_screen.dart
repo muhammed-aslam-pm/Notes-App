@@ -46,12 +46,11 @@ class _HomeScreenState extends State<HomeScreen> {
     catController.initializeApp();
     categories = catController.getAllCategories();
     fetchData();
-    // TODO: implement initState
     super.initState();
   }
 
   void fetchData() async {
-    myKeysList = await noteBox.keys.toList();
+    myKeysList = noteBox.keys.toList();
     categories = catController.getAllCategories();
     setState(() {});
   }
@@ -61,14 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: ColorConstants.primaryBackgroundColor,
       floatingActionButton: FloatingActionButton(
-        shape: OutlineInputBorder(
+        shape: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(15)),
           borderSide: BorderSide(width: 2, color: Colors.white),
         ),
         elevation: 0,
         onPressed: () => bottomSheet(context),
-        child: Icon(Icons.add),
         backgroundColor: ColorConstants.primaryColor,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
       ),
       body: SafeArea(
         child: Padding(
@@ -77,82 +77,78 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, index) {
                 List<NotesModel> notesInCategory =
                     noteBox.get(myKeysList[index])!.cast<NotesModel>();
-                return Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        categories[myKeysList[index]],
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: ColorConstants.primaryColor),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: List.generate(
-                            notesInCategory.length,
-                            (inIndex) {
-                              return NoteWidgets(
-                                title: notesInCategory[
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      categories[myKeysList[index]],
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: ColorConstants.primaryColor),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(
+                          notesInCategory.length,
+                          (inIndex) {
+                            return NoteWidgets(
+                              title: notesInCategory[
+                                      notesInCategory.length - inIndex - 1]
+                                  .title,
+                              description: notesInCategory[
+                                      notesInCategory.length - inIndex - 1]
+                                  .description,
+                              date: notesInCategory[
+                                      notesInCategory.length - inIndex - 1]
+                                  .date,
+                              category: categories[myKeysList[index]],
+                              onDelete: () {
+                                notesController.deleteNote(
+                                  key: myKeysList[index],
+                                  note: notesInCategory[
+                                      notesInCategory.length - inIndex - 1],
+                                  fetchData: fetchData,
+                                  index: notesInCategory.length - inIndex - 1,
+                                );
+                                fetchData();
+                                setState(() {});
+                              },
+                              onUpdate: () {
+                                titleController.text = notesInCategory[
                                         notesInCategory.length - inIndex - 1]
-                                    .title,
-                                description: notesInCategory[
+                                    .title;
+                                descriptionController.text = notesInCategory[
                                         notesInCategory.length - inIndex - 1]
-                                    .description,
-                                date: notesInCategory[
+                                    .description;
+                                categoryIndex = notesInCategory[
                                         notesInCategory.length - inIndex - 1]
-                                    .date,
-                                category: categories[myKeysList[index]],
-                                onDelete: () {
-                                  print(
-                                      "index1: ${notesInCategory.length - inIndex - 1}");
-                                  notesController.deleteNote(
+                                    .category;
+                                isEditing = true;
+                                bottomSheet(context,
                                     key: myKeysList[index],
-                                    note: notesInCategory[
-                                        notesInCategory.length - inIndex - 1],
-                                    fetchData: fetchData,
-                                    index: notesInCategory.length - inIndex - 1,
-                                  );
-                                  fetchData();
-                                  setState(() {});
-                                },
-                                onUpdate: () {
-                                  titleController.text = notesInCategory[
-                                          notesInCategory.length - inIndex - 1]
-                                      .title;
-                                  descriptionController.text = notesInCategory[
-                                          notesInCategory.length - inIndex - 1]
-                                      .description;
-                                  categoryIndex = notesInCategory[
-                                          notesInCategory.length - inIndex - 1]
-                                      .category;
-                                  isEditing = true;
-                                  bottomSheet(context,
-                                      key: myKeysList[index],
-                                      indexOfEditing:
-                                          notesInCategory.length - inIndex - 1,
-                                      currentCategory: notesInCategory[
-                                              notesInCategory.length -
-                                                  inIndex -
-                                                  1]
-                                          .category);
-                                  setState(() {});
-                                },
-                              );
-                            },
-                          ),
+                                    indexOfEditing:
+                                        notesInCategory.length - inIndex - 1,
+                                    currentCategory: notesInCategory[
+                                            notesInCategory.length -
+                                                inIndex -
+                                                1]
+                                        .category);
+                                setState(() {});
+                              },
+                            );
+                          },
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 );
               },
-              separatorBuilder: (context, index) => Divider(
+              separatorBuilder: (context, index) => const Divider(
                     height: 20,
                   ),
               itemCount: myKeysList.length),
@@ -176,12 +172,12 @@ class _HomeScreenState extends State<HomeScreen> {
       isScrollControlled: true,
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, InsetState) => Padding(
+        builder: (context, insetState) => Padding(
           padding:
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: SingleChildScrollView(
             child: Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -206,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: ColorConstants.primaryColor,
                             )),
                         isDense: false, // Added this
-                        contentPadding: EdgeInsets.all(20),
+                        contentPadding: const EdgeInsets.all(20),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -215,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     SizedBox(
@@ -243,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: ColorConstants.primaryColor,
                               )),
                           isDense: false, // Added this
-                          contentPadding: EdgeInsets.all(20),
+                          contentPadding: const EdgeInsets.all(20),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -253,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Text(
@@ -263,152 +259,155 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontSize: 20,
                           fontWeight: FontWeight.w700),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: List.generate(
-                            categories.length + 1,
-                            (index) => index == categories.length
-                                ? InkWell(
-                                    onTap: () => catController.addCategory(
-                                        context: context,
-                                        categoryController: categoryController,
-                                        catController: catController,
-                                        fetchdata: fetchData),
+                          categories.length + 1,
+                          (index) => index == categories.length
+                              ? InkWell(
+                                  onTap: () => catController.addCategory(
+                                      context: context,
+                                      categoryController: categoryController,
+                                      catController: catController,
+                                      fetchdata: fetchData),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: const Text(
+                                      " + Add Category",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white),
+                                    ),
+                                  ),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.only(right: 15),
+                                  child: InkWell(
+                                    onTap: () {
+                                      categoryIndex = index;
+                                      insetState(() {});
+                                    },
+                                    onLongPress: () {
+                                      catController.removeCategory(
+                                          catIndex: index,
+                                          catName: categories[index].toString(),
+                                          context: context,
+                                          fetchData: fetchData);
+                                      fetchData();
+
+                                      setState(() {});
+                                      insetState(() {});
+                                    },
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                         horizontal: 15,
                                         vertical: 10,
                                       ),
                                       decoration: BoxDecoration(
-                                          color: Colors.black,
+                                          color: categoryIndex == index
+                                              ? Colors.black
+                                              : ColorConstants.primaryCardColor,
                                           borderRadius:
                                               BorderRadius.circular(10)),
                                       child: Text(
-                                        " + Add Category",
-                                        style: TextStyle(
+                                        categories[index].toString(),
+                                        style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.white),
                                       ),
                                     ),
-                                  )
-                                : Padding(
-                                    padding: const EdgeInsets.only(right: 15),
-                                    child: InkWell(
-                                      onTap: () {
-                                        categoryIndex = index;
-                                        InsetState(() {});
-                                      },
-                                      onLongPress: () {
-                                        print(index);
-                                        print(categories[index].toString());
-                                        catController.removeCategory(
-                                            catIndex: index,
-                                            catName:
-                                                categories[index].toString(),
-                                            context: context,
-                                            fetchData: fetchData);
-                                        fetchData();
-
-                                        setState(() {});
-                                        InsetState(() {});
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 15,
-                                          vertical: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                            color: categoryIndex == index
-                                                ? Colors.black
-                                                : ColorConstants
-                                                    .primaryCardColor,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: Text(
-                                          categories[index].toString(),
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  )),
+                                  ),
+                                ),
+                        ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(
-                          width: 80,
-                          child: ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
-                                      ColorConstants.primaryColor)),
-                              onPressed: () {
-                                titleController.clear();
-                                descriptionController.clear();
-                                Navigator.pop(context);
-                                isEditing = false;
-                                setState(() {});
-                              },
-                              child: Text("Cancel")),
-                        ),
-                        SizedBox(
+                        ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStatePropertyAll(
+                                  ColorConstants.primaryColor),
+                              foregroundColor:
+                                  const MaterialStatePropertyAll(Colors.white),
+                            ),
+                            onPressed: () {
+                              titleController.clear();
+                              descriptionController.clear();
+                              Navigator.pop(context);
+                              isEditing = false;
+                              setState(() {});
+                            },
+                            child: const Text("Cancel")),
+                        const SizedBox(
                           width: 30,
                         ),
-                        SizedBox(
-                          width: 80,
-                          child: ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
-                                      ColorConstants.primaryColor)),
-                              onPressed: () {
-                                if (isEditing) {
-                                  notesController.editNote(
-                                      title: titleController.text,
-                                      description: descriptionController.text,
-                                      date: DateFormat('dd,MM,yyyy')
-                                          .format(DateTime.now())
-                                          .toString(),
-                                      category: categoryIndex,
-                                      oldCategory: currentCategory!,
-                                      formkey: _formKey,
-                                      indexOfNote: indexOfEditing!);
-                                  isEditing = false;
-                                  titleController.clear();
-                                  descriptionController.clear();
-                                  fetchData();
-                                  categoryIndex = 0;
-                                  Navigator.pop(context);
-                                } else {
-                                  notesController.addNotes(
-                                      formkey: _formKey,
-                                      title: titleController.text,
-                                      description: descriptionController.text,
-                                      date: DateFormat('dd,MM,yyyy')
-                                          .format(DateTime.now())
-                                          .toString(),
-                                      category: categoryIndex,
-                                      context: context,
-                                      desController: descriptionController,
-                                      titleController: titleController);
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStatePropertyAll(
+                                ColorConstants.primaryColor),
+                            foregroundColor:
+                                const MaterialStatePropertyAll(Colors.white),
+                          ),
+                          onPressed: () {
+                            if (isEditing) {
+                              notesController.editNote(
+                                  title: titleController.text,
+                                  description: descriptionController.text,
+                                  date: DateFormat('dd,MM,yyyy')
+                                      .format(DateTime.now())
+                                      .toString(),
+                                  category: categoryIndex,
+                                  oldCategory: currentCategory!,
+                                  formkey: _formKey,
+                                  indexOfNote: indexOfEditing!);
+                              isEditing = false;
+                              titleController.clear();
+                              descriptionController.clear();
+                              fetchData();
+                              categoryIndex = 0;
+                              Navigator.pop(context);
+                            } else {
+                              notesController.addNotes(
+                                  formkey: _formKey,
+                                  title: titleController.text,
+                                  description: descriptionController.text,
+                                  date: DateFormat('dd,MM,yyyy')
+                                      .format(DateTime.now())
+                                      .toString(),
+                                  category: categoryIndex,
+                                  context: context,
+                                  desController: descriptionController,
+                                  titleController: titleController);
 
-                                  fetchData();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Note added ")));
-                                  setState(() {});
-                                }
-                              },
-                              child: isEditing ? Text("Edit") : Text("Add")),
+                              fetchData();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Note added "),
+                                ),
+                              );
+                              setState(() {});
+                            }
+                          },
+                          child: isEditing
+                              ? const Text("Edit")
+                              : const Text("Add"),
                         ),
                       ],
                     )

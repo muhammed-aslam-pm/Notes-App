@@ -35,12 +35,12 @@ class NoteWidgets extends StatelessWidget {
                   category: category),
             )),
         child: Container(
-          height: 200,
+          height: 210,
           width: MediaQuery.sizeOf(context).width - 80,
           decoration: BoxDecoration(
               color: ColorConstants.primaryCardColor,
               borderRadius: BorderRadius.circular(20)),
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -51,25 +51,30 @@ class NoteWidgets extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20),
+                      SizedBox(
+                        width: MediaQuery.sizeOf(context).width - 216,
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20),
+                        ),
                       ),
                       Row(
                         children: [
                           IconButton(
                             onPressed: onUpdate,
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.edit,
                               color: Colors.white,
                             ),
                           ),
                           IconButton(
                             onPressed: onDelete,
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.delete,
                               color: Colors.white,
                             ),
@@ -82,9 +87,9 @@ class NoteWidgets extends StatelessWidget {
                     description,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   )
                 ],
@@ -96,7 +101,7 @@ class NoteWidgets extends StatelessWidget {
                     date,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
                   IconButton(
                       onPressed: () {
@@ -104,7 +109,7 @@ class NoteWidgets extends StatelessWidget {
                             "$title \n\n $description \n \n                          $date";
                         NotesController().shareNote(Note: note);
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.share,
                         color: Colors.white,
                       ))
