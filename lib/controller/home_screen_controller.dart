@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:share/share.dart';
 import 'package:to_do_project_1/model/notes_model.dart';
@@ -7,31 +7,31 @@ import 'package:to_do_project_1/view/home_screen/widgets/add_category_dialog.dar
 import 'package:to_do_project_1/view/home_screen/widgets/remove_category_dialog.dart';
 
 class CategoryController {
-  final CatBox = Hive.box('categories');
+  final catBox = Hive.box('categories');
   final noteBox = Hive.box('noteBox');
   void initializeApp() async {
     // List of default categories
     List<String> defaultCategories = ['Work', 'Personal', 'Ideas'];
 
     // Check if categories already exist
-    bool categoriesExist = CatBox.isNotEmpty;
+    bool categoriesExist = catBox.isNotEmpty;
 
     // If default categories don't exist, add them
     if (!categoriesExist) {
       for (String categoryName in defaultCategories) {
-        CatBox.add(categoryName);
+        catBox.add(categoryName);
       }
     }
   }
 
 // Function to add a user-defined category
   void addUserCategory(String categoryName) {
-    CatBox.add(categoryName);
+    catBox.add(categoryName);
   }
 
   // Function to get all categories
   List getAllCategories() {
-    return CatBox.values.toList();
+    return catBox.values.toList();
   }
 
   addCategory({
@@ -50,11 +50,8 @@ class CategoryController {
   }
 
   removeUserCategory({required int catIndex, required Function() fetchData}) {
-    print(catIndex);
-    print(CatBox.get(catIndex));
-    print(noteBox.get(catIndex));
     noteBox.delete(catIndex);
-    CatBox.delete(catIndex);
+    catBox.delete(catIndex);
     fetchData();
   }
 
@@ -110,22 +107,15 @@ class NotesController {
     required int index,
   }) {
     List<NotesModel> list = noteBox.get(key)!.cast<NotesModel>();
-    print("before: $list");
-    print("index: $index");
-    print("lis length  : ${list.length}");
 
     if (index < 0 || index >= list.length) {
-      print("Invalid index: $index. Index out of range.");
       return; // Exit the function if index is out of range
     }
 
-    print("before2: $list");
     list.remove(note);
-    print("after: $list");
     noteBox.put(key, list);
-    print("updated: ${noteBox.get(key)}");
 
-    if (list.length == 0) {
+    if (list.isEmpty) {
       noteBox.delete(key);
     }
   }
@@ -161,7 +151,7 @@ class NotesController {
     noteBox.put(category, updatedNotes);
   }
 
-  void shareNote({required String Note}) {
-    Share.share(Note);
+  void shareNote({required String note}) {
+    Share.share(note);
   }
 }

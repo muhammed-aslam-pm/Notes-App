@@ -107,7 +107,7 @@ class NoteWidgets extends StatelessWidget {
                       onPressed: () {
                         String note =
                             "$title \n\n $description \n \n                          $date";
-                        NotesController().shareNote(Note: note);
+                        NotesController().shareNote(note: note);
                       },
                       icon: const Icon(
                         Icons.share,

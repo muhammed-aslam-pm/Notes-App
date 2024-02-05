@@ -12,13 +12,15 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    Future.delayed(Duration(seconds: 2)).then((value) => Navigator.push(
+    Future.delayed(const Duration(seconds: 2)).then(
+      (value) => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeScreen(),
-        )));
+          builder: (context) => const HomeScreen(),
+        ),
+      ),
+    );
 
-    // TODO: implement initState
     super.initState();
   }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:to_do_project_1/utils/color_constants.dart';
 
 class NotePage extends StatelessWidget {
@@ -39,7 +38,7 @@ class NotePage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Text(
@@ -54,7 +53,7 @@ class NotePage extends StatelessWidget {
               style: TextStyle(
                   color: ColorConstants.secondaryColor1, fontSize: 15),
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             Text(
@@ -66,7 +65,7 @@ class NotePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         shape: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15)),
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
           borderSide: BorderSide(
             color: ColorConstants.primaryBackgroundColor,
           ),

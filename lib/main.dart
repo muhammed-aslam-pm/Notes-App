@@ -6,11 +6,11 @@ import 'package:to_do_project_1/view/slash_screen/splash_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  var catBox = await Hive.openBox('categories');
+  await Hive.openBox('categories');
   Hive.registerAdapter(NotesModelAdapter());
-  var box = await Hive.openBox('noteBox');
+  await Hive.openBox('noteBox');
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
     );
